@@ -41,6 +41,7 @@
 - Implemented the first Phase 2 slice: store settings read/update with permissions, audit logging, and passing unit/integration/e2e tests.
 - Implemented store locales, store currencies, and store tax config with repository logic, service flows, protected admin endpoints, audit logging, and passing tests.
 - Confirmed the open Phase 3 decisions: customers are tenant-scoped, guest support uses `customers.is_guest`, and storefront customer auth will reuse the current auth pattern through separate storefront flows.
+- Confirmed the open Phase 4 decisions: products are tenant-scoped and store-scoped, pricing fields stay out of Phase 4, and category trees support unlimited nesting through `parent_id`.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -167,8 +168,15 @@
 - `PHASE_1_DATA_MODEL.md` contains the exact first-pass entities, relationships, constraints, and Prisma modeling notes for Phase 1.
 - `PHASE_2_PLAN.md`, `PHASE_2_DATA_MODEL.md`, `PHASE_2_TEST_PLAN.md`, and `PHASE_2_IMPLEMENTATION_PLAN.md` cover the completed store-configuration phase.
 - `PHASE_3_PLAN.md`, `PHASE_3_DATA_MODEL.md`, `PHASE_3_TEST_PLAN.md`, and `PHASE_3_IMPLEMENTATION_PLAN.md` start planning for the next module: customer domain.
+- `PHASE_4_PLAN.md`, `PHASE_4_DATA_MODEL.md`, `PHASE_4_TEST_PLAN.md`, and `PHASE_4_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: catalog and merchandising.
 
 ## Next Likely Steps
 
-- The next planned module beyond store configuration is customer domain.
-- Phase 3 planning has started; customer implementation should follow those planning docs.
+- The next roadmap phase after the completed customer domain is catalog and merchandising.
+- Phase 4 planning has started; catalog implementation should follow those planning docs.
+- Phase 4 Prisma schema changes for catalog and merchandising are now implemented and validated.
+- Phase 4 Prisma migration `phase_4_catalog_merchandising` has been generated and applied.
+- Real Phase 4 test files now exist for catalog implementation targets.
+- The project still builds cleanly and the current suite remains green with Phase 4 tests added as implementation targets.
+- Implemented the Phase 4 catalog domain for products, variants, categories, collections, and storefront catalog reads.
+- The current Phase 4 catalog scope is now fully implemented and all tests are passing.

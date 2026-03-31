@@ -27,19 +27,31 @@ enum CustomerStatus {
   INACTIVE
 }
 
+enum CatalogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 model Tenant {
-  id        String          @id @default(uuid()) @db.Uuid
-  slug      String          @unique
-  name      String
-  status    TenantStatus    @default(ACTIVE)
-  createdAt DateTime        @default(now()) @map("created_at")
-  updatedAt DateTime        @updatedAt @map("updated_at")
-  settings  TenantSettings?
-  stores    Store[]
-  users     User[]
-  customers Customer[]
-  roles     Role[]
-  auditLogs AuditLog[]
+  id          String          @id @default(uuid()) @db.Uuid
+  slug        String          @unique
+  name        String
+  status      TenantStatus    @default(ACTIVE)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  settings    TenantSettings?
+  stores      Store[]
+  users       User[]
+  customers   Customer[]
+  products    Product[]
+  categories  Category[]
+  collections Collection[]
+  brands      Brand[]
+  tags        Tag[]
+  attributes  Attribute[]
+  roles       Role[]
+  auditLogs   AuditLog[]
 
   @@map("tenants")
 }
@@ -57,18 +69,24 @@ model TenantSettings {
 }
 
 model Store {
-  id         String          @id @default(uuid()) @db.Uuid
-  tenantId   String          @map("tenant_id") @db.Uuid
-  slug       String
-  name       String
-  status     StoreStatus     @default(ACTIVE)
-  createdAt  DateTime        @default(now()) @map("created_at")
-  updatedAt  DateTime        @updatedAt @map("updated_at")
-  tenant     Tenant          @relation(fields: [tenantId], references: [id])
-  settings   StoreSettings?
-  locales    StoreLocale[]
-  currencies StoreCurrency[]
-  taxConfig  StoreTaxConfig?
+  id          String          @id @default(uuid()) @db.Uuid
+  tenantId    String          @map("tenant_id") @db.Uuid
+  slug        String
+  name        String
+  status      StoreStatus     @default(ACTIVE)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  tenant      Tenant          @relation(fields: [tenantId], references: [id])
+  settings    StoreSettings?
+  locales     StoreLocale[]
+  currencies  StoreCurrency[]
+  taxConfig   StoreTaxConfig?
+  products    Product[]
+  categories  Category[]
+  collections Collection[]
+  brands      Brand[]
+  tags        Tag[]
+  attributes  Attribute[]
 
   @@unique([tenantId, slug])
   @@map("stores")
@@ -133,60 +151,60 @@ model StoreTaxConfig {
 }
 
 model Customer {
-  id             String             @id @default(uuid()) @db.Uuid
-  tenantId       String             @map("tenant_id") @db.Uuid
-  email          String
-  passwordHash   String?            @map("password_hash")
-  firstName      String             @map("first_name")
-  lastName       String             @map("last_name")
-  phone          String?
-  status         CustomerStatus     @default(ACTIVE)
-  isGuest        Boolean            @default(false) @map("is_guest")
-  lastLoginAt    DateTime?          @map("last_login_at")
-  createdAt      DateTime           @default(now()) @map("created_at")
-  updatedAt      DateTime           @updatedAt @map("updated_at")
-  tenant         Tenant             @relation(fields: [tenantId], references: [id])
-  addresses      CustomerAddress[]
-  preferences    CustomerPreference?
-  sessions       CustomerSession[]
+  id           String              @id @default(uuid()) @db.Uuid
+  tenantId     String              @map("tenant_id") @db.Uuid
+  email        String
+  passwordHash String?             @map("password_hash")
+  firstName    String              @map("first_name")
+  lastName     String              @map("last_name")
+  phone        String?
+  status       CustomerStatus      @default(ACTIVE)
+  isGuest      Boolean             @default(false) @map("is_guest")
+  lastLoginAt  DateTime?           @map("last_login_at")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  tenant       Tenant              @relation(fields: [tenantId], references: [id])
+  addresses    CustomerAddress[]
+  preferences  CustomerPreference?
+  sessions     CustomerSession[]
 
   @@unique([tenantId, email])
   @@map("customers")
 }
 
 model CustomerAddress {
-  id               String   @id @default(uuid()) @db.Uuid
-  customerId       String   @map("customer_id") @db.Uuid
-  label            String?
-  firstName        String   @map("first_name")
-  lastName         String   @map("last_name")
-  company          String?
-  line1            String   @map("line_1")
-  line2            String?  @map("line_2")
-  city             String
-  region           String?
-  postalCode       String   @map("postal_code")
-  countryCode      String   @map("country_code")
-  phone            String?
-  isDefaultShipping Boolean @default(false) @map("is_default_shipping")
-  isDefaultBilling Boolean  @default(false) @map("is_default_billing")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-  customer         Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  id                String   @id @default(uuid()) @db.Uuid
+  customerId        String   @map("customer_id") @db.Uuid
+  label             String?
+  firstName         String   @map("first_name")
+  lastName          String   @map("last_name")
+  company           String?
+  line1             String   @map("line_1")
+  line2             String?  @map("line_2")
+  city              String
+  region            String?
+  postalCode        String   @map("postal_code")
+  countryCode       String   @map("country_code")
+  phone             String?
+  isDefaultShipping Boolean  @default(false) @map("is_default_shipping")
+  isDefaultBilling  Boolean  @default(false) @map("is_default_billing")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  customer          Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@map("customer_addresses")
 }
 
 model CustomerPreference {
-  id                 String   @id @default(uuid()) @db.Uuid
-  customerId         String   @unique @map("customer_id") @db.Uuid
-  localeCode         String?  @map("locale_code")
-  currencyCode       String?  @map("currency_code")
-  marketingEmailOptIn Boolean @default(false) @map("marketing_email_opt_in")
-  marketingSmsOptIn  Boolean  @default(false) @map("marketing_sms_opt_in")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
-  customer           Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  id                  String   @id @default(uuid()) @db.Uuid
+  customerId          String   @unique @map("customer_id") @db.Uuid
+  localeCode          String?  @map("locale_code")
+  currencyCode        String?  @map("currency_code")
+  marketingEmailOptIn Boolean  @default(false) @map("marketing_email_opt_in")
+  marketingSmsOptIn   Boolean  @default(false) @map("marketing_sms_opt_in")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  customer            Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@map("customer_preferences")
 }
@@ -204,6 +222,197 @@ model CustomerSession {
 
   @@index([customerId])
   @@map("customer_sessions")
+}
+
+model Product {
+  id          String              @id @default(uuid()) @db.Uuid
+  tenantId    String              @map("tenant_id") @db.Uuid
+  storeId     String              @map("store_id") @db.Uuid
+  slug        String
+  title       String
+  description String?
+  status      CatalogStatus       @default(DRAFT)
+  brandId     String?             @map("brand_id") @db.Uuid
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+  tenant      Tenant              @relation(fields: [tenantId], references: [id])
+  store       Store               @relation(fields: [storeId], references: [id])
+  brand       Brand?              @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  variants    ProductVariant[]
+  categories  ProductCategory[]
+  collections ProductCollection[]
+  tags        ProductTag[]
+  media       ProductMedia[]
+
+  @@unique([storeId, slug])
+  @@map("products")
+}
+
+model ProductVariant {
+  id         String                  @id @default(uuid()) @db.Uuid
+  productId  String                  @map("product_id") @db.Uuid
+  sku        String
+  title      String
+  status     CatalogStatus           @default(DRAFT)
+  createdAt  DateTime                @default(now()) @map("created_at")
+  updatedAt  DateTime                @updatedAt @map("updated_at")
+  product    Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributes VariantAttributeValue[]
+
+  @@unique([productId, sku])
+  @@map("product_variants")
+}
+
+model Category {
+  id        String            @id @default(uuid()) @db.Uuid
+  tenantId  String            @map("tenant_id") @db.Uuid
+  storeId   String            @map("store_id") @db.Uuid
+  slug      String
+  name      String
+  parentId  String?           @map("parent_id") @db.Uuid
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  tenant    Tenant            @relation(fields: [tenantId], references: [id])
+  store     Store             @relation(fields: [storeId], references: [id])
+  parent    Category?         @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Category[]        @relation("CategoryTree")
+  products  ProductCategory[]
+
+  @@unique([storeId, slug])
+  @@map("categories")
+}
+
+model ProductCategory {
+  id         String   @id @default(uuid()) @db.Uuid
+  productId  String   @map("product_id") @db.Uuid
+  categoryId String   @map("category_id") @db.Uuid
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, categoryId])
+  @@map("product_categories")
+}
+
+model Collection {
+  id        String              @id @default(uuid()) @db.Uuid
+  tenantId  String              @map("tenant_id") @db.Uuid
+  storeId   String              @map("store_id") @db.Uuid
+  slug      String
+  name      String
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+  tenant    Tenant              @relation(fields: [tenantId], references: [id])
+  store     Store               @relation(fields: [storeId], references: [id])
+  products  ProductCollection[]
+
+  @@unique([storeId, slug])
+  @@map("collections")
+}
+
+model ProductCollection {
+  id           String     @id @default(uuid()) @db.Uuid
+  productId    String     @map("product_id") @db.Uuid
+  collectionId String     @map("collection_id") @db.Uuid
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, collectionId])
+  @@map("product_collections")
+}
+
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  storeId   String    @map("store_id") @db.Uuid
+  slug      String
+  name      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  store     Store     @relation(fields: [storeId], references: [id])
+  products  Product[]
+
+  @@unique([storeId, slug])
+  @@map("brands")
+}
+
+model Tag {
+  id        String       @id @default(uuid()) @db.Uuid
+  tenantId  String       @map("tenant_id") @db.Uuid
+  storeId   String       @map("store_id") @db.Uuid
+  value     String
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  tenant    Tenant       @relation(fields: [tenantId], references: [id])
+  store     Store        @relation(fields: [storeId], references: [id])
+  products  ProductTag[]
+
+  @@unique([storeId, value])
+  @@map("tags")
+}
+
+model ProductTag {
+  id        String  @id @default(uuid()) @db.Uuid
+  productId String  @map("product_id") @db.Uuid
+  tagId     String  @map("tag_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, tagId])
+  @@map("product_tags")
+}
+
+model Attribute {
+  id        String           @id @default(uuid()) @db.Uuid
+  tenantId  String           @map("tenant_id") @db.Uuid
+  storeId   String           @map("store_id") @db.Uuid
+  name      String
+  code      String
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  tenant    Tenant           @relation(fields: [tenantId], references: [id])
+  store     Store            @relation(fields: [storeId], references: [id])
+  values    AttributeValue[]
+
+  @@unique([storeId, code])
+  @@map("attributes")
+}
+
+model AttributeValue {
+  id          String                  @id @default(uuid()) @db.Uuid
+  attributeId String                  @map("attribute_id") @db.Uuid
+  value       String
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+  attribute   Attribute               @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  variants    VariantAttributeValue[]
+
+  @@unique([attributeId, value])
+  @@map("attribute_values")
+}
+
+model VariantAttributeValue {
+  id               String         @id @default(uuid()) @db.Uuid
+  variantId        String         @map("variant_id") @db.Uuid
+  attributeValueId String         @map("attribute_value_id") @db.Uuid
+  variant          ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
+
+  @@unique([variantId, attributeValueId])
+  @@map("variant_attribute_values")
+}
+
+model ProductMedia {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  url       String
+  altText   String?  @map("alt_text")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_media")
 }
 
 model User {
