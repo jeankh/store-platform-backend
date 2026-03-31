@@ -28,6 +28,18 @@
 - Added passing unit tests for tenant, store, access-control, and audit service behavior.
 - Wired the remaining Phase 1 integration and e2e tests for tenant, store, access-control, audit, and error handling.
 - Added DTO validation and UUID-aware route validation to support consistent 400/404 behavior.
+- Added Postman collection and local environment templates for manual Phase 1 API testing.
+- Cleaned up Phase 1 module wiring to a stable hybrid pattern: explicit repository factories where needed, normal Nest providers elsewhere.
+- Added `PHASE_2_PLAN.md` to define the next implementation phase around store configuration.
+- Added `PHASE_2_DATA_MODEL.md` to define the planned Phase 2 entities and schema changes.
+- Added `PHASE_2_TEST_PLAN.md` to define the expected Phase 2 test coverage before implementation.
+- Confirmed the open Phase 2 decisions: tax config owns `tax_inclusive`, branding uses `logo_url` only for now, locales use BCP 47 style validation, and currencies use ISO 4217 uppercase validation.
+- Implemented the first Phase 2 Prisma schema changes for extended store settings, store locales, store currencies, and store tax configs.
+- Validated and formatted the updated Prisma schema successfully.
+- Generated and applied the Phase 2 Prisma migration: `phase_2_store_configuration`.
+- Added `PHASE_2_IMPLEMENTATION_PLAN.md` to track the Phase 2 implementation sequence.
+- Implemented the first Phase 2 slice: store settings read/update with permissions, audit logging, and passing unit/integration/e2e tests.
+- Implemented store locales, store currencies, and store tax config with repository logic, service flows, protected admin endpoints, audit logging, and passing tests.
 
 ## Key Files Created or Updated
 
@@ -76,6 +88,12 @@
 - `test/e2e/admin/roles.e2e-spec.ts`
 - `test/e2e/admin/audit-logs.e2e-spec.ts`
 - `test/e2e/admin/errors.e2e-spec.ts`
+- `docs/postman/e-com-phase-1.postman_collection.json`
+- `docs/postman/e-com-local.postman_environment.json`
+- `PHASE_2_PLAN.md`
+- `PHASE_2_DATA_MODEL.md`
+- `PHASE_2_TEST_PLAN.md`
+- `PHASE_2_IMPLEMENTATION_PLAN.md`
 - `test/setup.ts`
 - `docker/docker-compose.yml`
 - `.github/workflows/ci.yml`
@@ -92,6 +110,8 @@
 - Local development services now run through Docker Compose for PostgreSQL, Redis, and Meilisearch.
 - Permission seeding currently happens during bootstrap-admin creation so the first tenant owner receives the seeded permission set.
 - Vitest is configured with `fileParallelism: false` because the e2e/integration suite shares one local PostgreSQL database.
+- Current module wiring favors stability in Nest/Vitest: Prisma-backed repositories use explicit factories, while most services and guards remain standard providers.
+- Phase 2 store configuration is now implemented and fully covered by passing tests.
 
 ## Decisions So Far
 

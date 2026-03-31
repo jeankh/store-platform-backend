@@ -2,12 +2,22 @@ import { describe, expect, it } from "vitest";
 
 import { AuditService } from "src/modules/audit/application/services/audit.service";
 import { StoreService } from "src/modules/store/application/services/store.service";
-import { StoreView } from "src/modules/store/domain/entities/store-record";
+import {
+  StoreCurrencyView,
+  StoreLocaleView,
+  StoreSettingsView,
+  StoreTaxConfigView,
+  StoreView,
+} from "src/modules/store/domain/entities/store-record";
 import { StoreRepository } from "src/modules/store/domain/repositories/store.repository";
 import { TenantService } from "src/modules/tenant/application/services/tenant.service";
 
 class InMemoryStoreRepository implements StoreRepository {
   stores = new Map<string, StoreView>();
+  settings = new Map<string, StoreSettingsView>();
+  locales = new Map<string, StoreLocaleView[]>();
+  currencies = new Map<string, StoreCurrencyView[]>();
+  taxConfigs = new Map<string, StoreTaxConfigView>();
 
   async create(input: {
     tenantId: string;
@@ -26,6 +36,20 @@ class InMemoryStoreRepository implements StoreRepository {
       defaultCurrency: input.defaultCurrency,
     };
     this.stores.set(store.id, store);
+    this.settings.set(store.id, {
+      storeId: store.id,
+      defaultLocale: store.defaultLocale,
+      defaultCurrency: store.defaultCurrency,
+      displayName: null,
+      supportEmail: null,
+      supportPhone: null,
+      timezone: null,
+      logoUrl: null,
+      primaryColor: null,
+      secondaryColor: null,
+    });
+    this.locales.set(store.id, []);
+    this.currencies.set(store.id, []);
     return store;
   }
 
@@ -66,6 +90,129 @@ class InMemoryStoreRepository implements StoreRepository {
     };
     this.stores.set(input.storeId, nextStore);
     return nextStore;
+  }
+
+  async getSettings(storeId: string) {
+    return this.settings.get(storeId) || null;
+  }
+
+  async updateSettings(input: {
+    storeId: string;
+    displayName?: string | null;
+    supportEmail?: string | null;
+    supportPhone?: string | null;
+    timezone?: string | null;
+    logoUrl?: string | null;
+    primaryColor?: string | null;
+    secondaryColor?: string | null;
+  }) {
+    const settings = this.settings.get(input.storeId)!;
+    const nextSettings: StoreSettingsView = {
+      ...settings,
+      displayName:
+        input.displayName !== undefined
+          ? input.displayName
+          : settings.displayName,
+      supportEmail:
+        input.supportEmail !== undefined
+          ? input.supportEmail
+          : settings.supportEmail,
+      supportPhone:
+        input.supportPhone !== undefined
+          ? input.supportPhone
+          : settings.supportPhone,
+      timezone:
+        input.timezone !== undefined ? input.timezone : settings.timezone,
+      logoUrl: input.logoUrl !== undefined ? input.logoUrl : settings.logoUrl,
+      primaryColor:
+        input.primaryColor !== undefined
+          ? input.primaryColor
+          : settings.primaryColor,
+      secondaryColor:
+        input.secondaryColor !== undefined
+          ? input.secondaryColor
+          : settings.secondaryColor,
+    };
+    this.settings.set(input.storeId, nextSettings);
+    return nextSettings;
+  }
+
+  async listLocales(storeId: string) {
+    return this.locales.get(storeId) || [];
+  }
+
+  async addLocale(input: {
+    storeId: string;
+    localeCode: string;
+    isDefault?: boolean;
+  }) {
+    const locale = {
+      storeId: input.storeId,
+      localeCode: input.localeCode,
+      isDefault: Boolean(input.isDefault),
+    };
+    const locales = this.locales.get(input.storeId) || [];
+    this.locales.set(input.storeId, [...locales, locale]);
+    return locale;
+  }
+
+  async removeLocale(storeId: string, localeCode: string) {
+    const locales = this.locales.get(storeId) || [];
+    this.locales.set(
+      storeId,
+      locales.filter((locale) => locale.localeCode !== localeCode),
+    );
+  }
+
+  async listCurrencies(storeId: string) {
+    return this.currencies.get(storeId) || [];
+  }
+
+  async addCurrency(input: {
+    storeId: string;
+    currencyCode: string;
+    isDefault?: boolean;
+  }) {
+    const currency = {
+      storeId: input.storeId,
+      currencyCode: input.currencyCode,
+      isDefault: Boolean(input.isDefault),
+    };
+    const currencies = this.currencies.get(input.storeId) || [];
+    this.currencies.set(input.storeId, [...currencies, currency]);
+    return currency;
+  }
+
+  async removeCurrency(storeId: string, currencyCode: string) {
+    const currencies = this.currencies.get(storeId) || [];
+    this.currencies.set(
+      storeId,
+      currencies.filter((currency) => currency.currencyCode !== currencyCode),
+    );
+  }
+
+  async getTaxConfig(storeId: string) {
+    return this.taxConfigs.get(storeId) || null;
+  }
+
+  async upsertTaxConfig(input: {
+    storeId: string;
+    countryCode: string;
+    taxInclusive: boolean;
+    regionCode?: string | null;
+    taxProvider?: string | null;
+    taxCalculationStrategy?: string | null;
+  }) {
+    const config = {
+      storeId: input.storeId,
+      countryCode: input.countryCode,
+      regionCode: input.regionCode || null,
+      taxInclusive: input.taxInclusive,
+      taxProvider: input.taxProvider || null,
+      taxCalculationStrategy: input.taxCalculationStrategy || null,
+    };
+    this.taxConfigs.set(input.storeId, config);
+    return config;
   }
 }
 

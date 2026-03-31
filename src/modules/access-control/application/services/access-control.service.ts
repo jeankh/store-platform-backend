@@ -22,6 +22,7 @@ export class AccessControlService {
   constructor(
     @Inject(ACCESS_CONTROL_REPOSITORY)
     private readonly repository: AccessControlRepository,
+    @Inject(AuditService)
     private readonly auditService: AuditService,
   ) {}
 

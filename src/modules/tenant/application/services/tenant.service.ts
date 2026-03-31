@@ -16,6 +16,7 @@ import { TENANT_REPOSITORY } from "../../domain/repositories/tenant.repository.t
 export class TenantService {
   constructor(
     @Inject(TENANT_REPOSITORY) private readonly repository: TenantRepository,
+    @Inject(AuditService)
     private readonly auditService: AuditService,
   ) {}
 

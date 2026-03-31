@@ -51,15 +51,18 @@ model TenantSettings {
 }
 
 model Store {
-  id        String         @id @default(uuid()) @db.Uuid
-  tenantId  String         @map("tenant_id") @db.Uuid
-  slug      String
-  name      String
-  status    StoreStatus    @default(ACTIVE)
-  createdAt DateTime       @default(now()) @map("created_at")
-  updatedAt DateTime       @updatedAt @map("updated_at")
-  tenant    Tenant         @relation(fields: [tenantId], references: [id])
-  settings  StoreSettings?
+  id         String          @id @default(uuid()) @db.Uuid
+  tenantId   String          @map("tenant_id") @db.Uuid
+  slug       String
+  name       String
+  status     StoreStatus     @default(ACTIVE)
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+  tenant     Tenant          @relation(fields: [tenantId], references: [id])
+  settings   StoreSettings?
+  locales    StoreLocale[]
+  currencies StoreCurrency[]
+  taxConfig  StoreTaxConfig?
 
   @@unique([tenantId, slug])
   @@map("stores")
@@ -70,11 +73,57 @@ model StoreSettings {
   storeId         String   @unique @map("store_id") @db.Uuid
   defaultLocale   String   @map("default_locale")
   defaultCurrency String   @map("default_currency")
+  displayName     String?  @map("display_name")
+  supportEmail    String?  @map("support_email")
+  supportPhone    String?  @map("support_phone")
+  timezone        String?
+  logoUrl         String?  @map("logo_url")
+  primaryColor    String?  @map("primary_color")
+  secondaryColor  String?  @map("secondary_color")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
   store           Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@map("store_settings")
+}
+
+model StoreLocale {
+  id         String   @id @default(uuid()) @db.Uuid
+  storeId    String   @map("store_id") @db.Uuid
+  localeCode String   @map("locale_code")
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at")
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, localeCode])
+  @@map("store_locales")
+}
+
+model StoreCurrency {
+  id           String   @id @default(uuid()) @db.Uuid
+  storeId      String   @map("store_id") @db.Uuid
+  currencyCode String   @map("currency_code")
+  isDefault    Boolean  @default(false) @map("is_default")
+  createdAt    DateTime @default(now()) @map("created_at")
+  store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, currencyCode])
+  @@map("store_currencies")
+}
+
+model StoreTaxConfig {
+  id                     String   @id @default(uuid()) @db.Uuid
+  storeId                String   @unique @map("store_id") @db.Uuid
+  countryCode            String   @map("country_code")
+  regionCode             String?  @map("region_code")
+  taxInclusive           Boolean  @default(false) @map("tax_inclusive")
+  taxProvider            String?  @map("tax_provider")
+  taxCalculationStrategy String?  @map("tax_calculation_strategy")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+  store                  Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("store_tax_configs")
 }
 
 model User {

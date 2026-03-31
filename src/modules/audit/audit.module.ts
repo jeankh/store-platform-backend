@@ -13,12 +13,7 @@ import { PrismaAuditRepository } from "./infrastructure/persistence/prisma-audit
       provide: AUDIT_REPOSITORY,
       useFactory: () => new PrismaAuditRepository(new PrismaService()),
     },
-    {
-      provide: AuditService,
-      useFactory: (repository: PrismaAuditRepository) =>
-        new AuditService(repository),
-      inject: [AUDIT_REPOSITORY],
-    },
+    AuditService,
   ],
   exports: [AuditService],
 })

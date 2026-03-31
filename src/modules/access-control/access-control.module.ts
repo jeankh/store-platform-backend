@@ -19,6 +19,7 @@ import { PermissionGuard } from "./presentation/admin/permission.guard";
   imports: [PrismaModule, AuditModule, IdentityModule],
   controllers: [AdminAccessControlController, AdminAuditController],
   providers: [
+    Reflector,
     {
       provide: ACCESS_CONTROL_REPOSITORY,
       useFactory: () => new PrismaAccessControlRepository(new PrismaService()),
