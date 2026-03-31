@@ -40,6 +40,14 @@
 - Added `PHASE_2_IMPLEMENTATION_PLAN.md` to track the Phase 2 implementation sequence.
 - Implemented the first Phase 2 slice: store settings read/update with permissions, audit logging, and passing unit/integration/e2e tests.
 - Implemented store locales, store currencies, and store tax config with repository logic, service flows, protected admin endpoints, audit logging, and passing tests.
+- Confirmed the open Phase 3 decisions: customers are tenant-scoped, guest support uses `customers.is_guest`, and storefront customer auth will reuse the current auth pattern through separate storefront flows.
+- Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
+- Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
+- Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
+- Applied the Phase 3 customer-domain migration to the local PostgreSQL database.
+- Verified the first Phase 3 customer slice with passing unit, integration, and storefront e2e tests.
+- Implemented customer addresses and admin customer management for Phase 3.
+- The current Phase 3 customer scope is now fully implemented and all tests are passing.
 
 ## Key Files Created or Updated
 
@@ -94,6 +102,15 @@
 - `PHASE_2_DATA_MODEL.md`
 - `PHASE_2_TEST_PLAN.md`
 - `PHASE_2_IMPLEMENTATION_PLAN.md`
+- `PHASE_3_PLAN.md`
+- `PHASE_3_DATA_MODEL.md`
+- `PHASE_3_TEST_PLAN.md`
+- `PHASE_3_IMPLEMENTATION_PLAN.md`
+- `prisma/migrations/20260331170000_phase_3_customer_domain/migration.sql`
+- `src/modules/customer/**/*`
+- `test/unit/modules/customer/*`
+- `test/integration/modules/customer/*`
+- `test/e2e/storefront/*`
 - `test/setup.ts`
 - `docker/docker-compose.yml`
 - `.github/workflows/ci.yml`
@@ -112,6 +129,9 @@
 - Vitest is configured with `fileParallelism: false` because the e2e/integration suite shares one local PostgreSQL database.
 - Current module wiring favors stability in Nest/Vitest: Prisma-backed repositories use explicit factories, while most services and guards remain standard providers.
 - Phase 2 store configuration is now implemented and fully covered by passing tests.
+- Phase 3 customer auth/profile code is started, but DB-backed verification and migration application are pending until local PostgreSQL is available again.
+- Phase 3 customer auth/profile is now active and verified; customer addresses and admin customer management remain planned but not yet implemented.
+- Phase 3 customer auth/profile, addresses, and admin customer management are now active and verified.
 
 ## Decisions So Far
 
@@ -145,9 +165,10 @@
 - `PHASE_1_IMPLEMENTATION_PLAN.md` contains the detailed implementation scope, order, deliverables, and test-first expectations for Phase 1.
 - `PHASE_1_TEST_PLAN.md` contains the test-first scenarios, coverage scope, and expected behaviors for Phase 1.
 - `PHASE_1_DATA_MODEL.md` contains the exact first-pass entities, relationships, constraints, and Prisma modeling notes for Phase 1.
+- `PHASE_2_PLAN.md`, `PHASE_2_DATA_MODEL.md`, `PHASE_2_TEST_PLAN.md`, and `PHASE_2_IMPLEMENTATION_PLAN.md` cover the completed store-configuration phase.
+- `PHASE_3_PLAN.md`, `PHASE_3_DATA_MODEL.md`, `PHASE_3_TEST_PLAN.md`, and `PHASE_3_IMPLEMENTATION_PLAN.md` start planning for the next module: customer domain.
 
 ## Next Likely Steps
 
-- Implement Prisma models and tests for Phase 1 based on the approved plans.
-- Begin feature implementation only after test cases and data-model choices are accepted.
-- Start with Prisma schema updates and test definitions for the Phase 1 modules.
+- The next planned module beyond store configuration is customer domain.
+- Phase 3 planning has started; customer implementation should follow those planning docs.

@@ -22,6 +22,11 @@ enum UserStatus {
   INACTIVE
 }
 
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model Tenant {
   id        String          @id @default(uuid()) @db.Uuid
   slug      String          @unique
@@ -32,6 +37,7 @@ model Tenant {
   settings  TenantSettings?
   stores    Store[]
   users     User[]
+  customers Customer[]
   roles     Role[]
   auditLogs AuditLog[]
 
@@ -124,6 +130,80 @@ model StoreTaxConfig {
   store                  Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@map("store_tax_configs")
+}
+
+model Customer {
+  id             String             @id @default(uuid()) @db.Uuid
+  tenantId       String             @map("tenant_id") @db.Uuid
+  email          String
+  passwordHash   String?            @map("password_hash")
+  firstName      String             @map("first_name")
+  lastName       String             @map("last_name")
+  phone          String?
+  status         CustomerStatus     @default(ACTIVE)
+  isGuest        Boolean            @default(false) @map("is_guest")
+  lastLoginAt    DateTime?          @map("last_login_at")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  tenant         Tenant             @relation(fields: [tenantId], references: [id])
+  addresses      CustomerAddress[]
+  preferences    CustomerPreference?
+  sessions       CustomerSession[]
+
+  @@unique([tenantId, email])
+  @@map("customers")
+}
+
+model CustomerAddress {
+  id               String   @id @default(uuid()) @db.Uuid
+  customerId       String   @map("customer_id") @db.Uuid
+  label            String?
+  firstName        String   @map("first_name")
+  lastName         String   @map("last_name")
+  company          String?
+  line1            String   @map("line_1")
+  line2            String?  @map("line_2")
+  city             String
+  region           String?
+  postalCode       String   @map("postal_code")
+  countryCode      String   @map("country_code")
+  phone            String?
+  isDefaultShipping Boolean @default(false) @map("is_default_shipping")
+  isDefaultBilling Boolean  @default(false) @map("is_default_billing")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  customer         Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_addresses")
+}
+
+model CustomerPreference {
+  id                 String   @id @default(uuid()) @db.Uuid
+  customerId         String   @unique @map("customer_id") @db.Uuid
+  localeCode         String?  @map("locale_code")
+  currencyCode       String?  @map("currency_code")
+  marketingEmailOptIn Boolean @default(false) @map("marketing_email_opt_in")
+  marketingSmsOptIn  Boolean  @default(false) @map("marketing_sms_opt_in")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  customer           Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_preferences")
+}
+
+model CustomerSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  customerId       String    @map("customer_id") @db.Uuid
+  ipAddress        String?   @map("ip_address")
+  userAgent        String?   @map("user_agent")
+  refreshTokenHash String    @map("refresh_token_hash")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  customer         Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@map("customer_sessions")
 }
 
 model User {
