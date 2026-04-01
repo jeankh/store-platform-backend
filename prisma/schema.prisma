@@ -33,25 +33,41 @@ enum CatalogStatus {
   ARCHIVED
 }
 
+enum CouponStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CouponType {
+  FIXED
+  PERCENTAGE
+}
+
 model Tenant {
-  id          String          @id @default(uuid()) @db.Uuid
-  slug        String          @unique
-  name        String
-  status      TenantStatus    @default(ACTIVE)
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-  settings    TenantSettings?
-  stores      Store[]
-  users       User[]
-  customers   Customer[]
-  products    Product[]
-  categories  Category[]
-  collections Collection[]
-  brands      Brand[]
-  tags        Tag[]
-  attributes  Attribute[]
-  roles       Role[]
-  auditLogs   AuditLog[]
+  id              String           @id @default(uuid()) @db.Uuid
+  slug            String           @unique
+  name            String
+  status          TenantStatus     @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  settings        TenantSettings?
+  stores          Store[]
+  users           User[]
+  customers       Customer[]
+  products        Product[]
+  categories      Category[]
+  collections     Collection[]
+  brands          Brand[]
+  tags            Tag[]
+  attributes      Attribute[]
+  prices          Price[]
+  compareAtPrices CompareAtPrice[]
+  scheduledPrices ScheduledPrice[]
+  coupons         Coupon[]
+  promotionRules  PromotionRule[]
+  promotionUsages PromotionUsage[]
+  roles           Role[]
+  auditLogs       AuditLog[]
 
   @@map("tenants")
 }
@@ -69,24 +85,30 @@ model TenantSettings {
 }
 
 model Store {
-  id          String          @id @default(uuid()) @db.Uuid
-  tenantId    String          @map("tenant_id") @db.Uuid
-  slug        String
-  name        String
-  status      StoreStatus     @default(ACTIVE)
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-  tenant      Tenant          @relation(fields: [tenantId], references: [id])
-  settings    StoreSettings?
-  locales     StoreLocale[]
-  currencies  StoreCurrency[]
-  taxConfig   StoreTaxConfig?
-  products    Product[]
-  categories  Category[]
-  collections Collection[]
-  brands      Brand[]
-  tags        Tag[]
-  attributes  Attribute[]
+  id              String           @id @default(uuid()) @db.Uuid
+  tenantId        String           @map("tenant_id") @db.Uuid
+  slug            String
+  name            String
+  status          StoreStatus      @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  tenant          Tenant           @relation(fields: [tenantId], references: [id])
+  settings        StoreSettings?
+  locales         StoreLocale[]
+  currencies      StoreCurrency[]
+  taxConfig       StoreTaxConfig?
+  products        Product[]
+  categories      Category[]
+  collections     Collection[]
+  brands          Brand[]
+  tags            Tag[]
+  attributes      Attribute[]
+  prices          Price[]
+  compareAtPrices CompareAtPrice[]
+  scheduledPrices ScheduledPrice[]
+  coupons         Coupon[]
+  promotionRules  PromotionRule[]
+  promotionUsages PromotionUsage[]
 
   @@unique([tenantId, slug])
   @@map("stores")
@@ -151,22 +173,23 @@ model StoreTaxConfig {
 }
 
 model Customer {
-  id           String              @id @default(uuid()) @db.Uuid
-  tenantId     String              @map("tenant_id") @db.Uuid
-  email        String
-  passwordHash String?             @map("password_hash")
-  firstName    String              @map("first_name")
-  lastName     String              @map("last_name")
-  phone        String?
-  status       CustomerStatus      @default(ACTIVE)
-  isGuest      Boolean             @default(false) @map("is_guest")
-  lastLoginAt  DateTime?           @map("last_login_at")
-  createdAt    DateTime            @default(now()) @map("created_at")
-  updatedAt    DateTime            @updatedAt @map("updated_at")
-  tenant       Tenant              @relation(fields: [tenantId], references: [id])
-  addresses    CustomerAddress[]
-  preferences  CustomerPreference?
-  sessions     CustomerSession[]
+  id              String              @id @default(uuid()) @db.Uuid
+  tenantId        String              @map("tenant_id") @db.Uuid
+  email           String
+  passwordHash    String?             @map("password_hash")
+  firstName       String              @map("first_name")
+  lastName        String              @map("last_name")
+  phone           String?
+  status          CustomerStatus      @default(ACTIVE)
+  isGuest         Boolean             @default(false) @map("is_guest")
+  lastLoginAt     DateTime?           @map("last_login_at")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  tenant          Tenant              @relation(fields: [tenantId], references: [id])
+  addresses       CustomerAddress[]
+  preferences     CustomerPreference?
+  sessions        CustomerSession[]
+  promotionUsages PromotionUsage[]
 
   @@unique([tenantId, email])
   @@map("customers")
@@ -249,15 +272,18 @@ model Product {
 }
 
 model ProductVariant {
-  id         String                  @id @default(uuid()) @db.Uuid
-  productId  String                  @map("product_id") @db.Uuid
-  sku        String
-  title      String
-  status     CatalogStatus           @default(DRAFT)
-  createdAt  DateTime                @default(now()) @map("created_at")
-  updatedAt  DateTime                @updatedAt @map("updated_at")
-  product    Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
-  attributes VariantAttributeValue[]
+  id              String                  @id @default(uuid()) @db.Uuid
+  productId       String                  @map("product_id") @db.Uuid
+  sku             String
+  title           String
+  status          CatalogStatus           @default(DRAFT)
+  createdAt       DateTime                @default(now()) @map("created_at")
+  updatedAt       DateTime                @updatedAt @map("updated_at")
+  product         Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributes      VariantAttributeValue[]
+  prices          Price[]
+  compareAtPrices CompareAtPrice[]
+  scheduledPrices ScheduledPrice[]
 
   @@unique([productId, sku])
   @@map("product_variants")
@@ -413,6 +439,113 @@ model ProductMedia {
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("product_media")
+}
+
+model Price {
+  id           String         @id @default(uuid()) @db.Uuid
+  tenantId     String         @map("tenant_id") @db.Uuid
+  storeId      String         @map("store_id") @db.Uuid
+  variantId    String         @map("variant_id") @db.Uuid
+  currencyCode String         @map("currency_code")
+  amount       Int
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  tenant       Tenant         @relation(fields: [tenantId], references: [id])
+  store        Store          @relation(fields: [storeId], references: [id])
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([variantId, currencyCode])
+  @@map("prices")
+}
+
+model CompareAtPrice {
+  id           String         @id @default(uuid()) @db.Uuid
+  tenantId     String         @map("tenant_id") @db.Uuid
+  storeId      String         @map("store_id") @db.Uuid
+  variantId    String         @map("variant_id") @db.Uuid
+  currencyCode String         @map("currency_code")
+  amount       Int
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  tenant       Tenant         @relation(fields: [tenantId], references: [id])
+  store        Store          @relation(fields: [storeId], references: [id])
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([variantId, currencyCode])
+  @@map("compare_at_prices")
+}
+
+model ScheduledPrice {
+  id           String         @id @default(uuid()) @db.Uuid
+  tenantId     String         @map("tenant_id") @db.Uuid
+  storeId      String         @map("store_id") @db.Uuid
+  variantId    String         @map("variant_id") @db.Uuid
+  currencyCode String         @map("currency_code")
+  amount       Int
+  startsAt     DateTime       @map("starts_at")
+  endsAt       DateTime?      @map("ends_at")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  tenant       Tenant         @relation(fields: [tenantId], references: [id])
+  store        Store          @relation(fields: [storeId], references: [id])
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("scheduled_prices")
+}
+
+model Coupon {
+  id         String           @id @default(uuid()) @db.Uuid
+  tenantId   String           @map("tenant_id") @db.Uuid
+  storeId    String           @map("store_id") @db.Uuid
+  code       String
+  type       CouponType
+  value      Int
+  status     CouponStatus     @default(ACTIVE)
+  startsAt   DateTime?        @map("starts_at")
+  endsAt     DateTime?        @map("ends_at")
+  usageLimit Int?             @map("usage_limit")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  tenant     Tenant           @relation(fields: [tenantId], references: [id])
+  store      Store            @relation(fields: [storeId], references: [id])
+  rules      PromotionRule[]
+  usages     PromotionUsage[]
+
+  @@unique([storeId, code])
+  @@map("coupons")
+}
+
+model PromotionRule {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  storeId   String   @map("store_id") @db.Uuid
+  couponId  String?  @map("coupon_id") @db.Uuid
+  resource  String
+  operator  String
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  store     Store    @relation(fields: [storeId], references: [id])
+  coupon    Coupon?  @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  @@map("promotion_rules")
+}
+
+model PromotionUsage {
+  id         String    @id @default(uuid()) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  storeId    String    @map("store_id") @db.Uuid
+  couponId   String    @map("coupon_id") @db.Uuid
+  customerId String?   @map("customer_id") @db.Uuid
+  orderId    String?   @map("order_id")
+  usedAt     DateTime  @default(now()) @map("used_at")
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  store      Store     @relation(fields: [storeId], references: [id])
+  coupon     Coupon    @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@map("promotion_usages")
 }
 
 model User {

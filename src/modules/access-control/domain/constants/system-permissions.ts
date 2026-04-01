@@ -146,6 +146,30 @@ export const SYSTEM_PERMISSIONS: PermissionDefinition[] = [
     action: "update",
   },
   {
+    code: "pricing.read",
+    name: "Read pricing",
+    resource: "pricing",
+    action: "read",
+  },
+  {
+    code: "pricing.update",
+    name: "Update pricing",
+    resource: "pricing",
+    action: "update",
+  },
+  {
+    code: "promotion.read",
+    name: "Read promotions",
+    resource: "promotion",
+    action: "read",
+  },
+  {
+    code: "promotion.update",
+    name: "Update promotions",
+    resource: "promotion",
+    action: "update",
+  },
+  {
     code: "role.create",
     name: "Create role",
     resource: "role",

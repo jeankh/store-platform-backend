@@ -42,6 +42,7 @@
 - Implemented store locales, store currencies, and store tax config with repository logic, service flows, protected admin endpoints, audit logging, and passing tests.
 - Confirmed the open Phase 3 decisions: customers are tenant-scoped, guest support uses `customers.is_guest`, and storefront customer auth will reuse the current auth pattern through separate storefront flows.
 - Confirmed the open Phase 4 decisions: products are tenant-scoped and store-scoped, pricing fields stay out of Phase 4, and category trees support unlimited nesting through `parent_id`.
+- Confirmed the open Phase 5 decisions: compare-at prices stay in a separate table, scheduled prices stay in a separate table, and monetary values use integer minor units.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -169,14 +170,18 @@
 - `PHASE_2_PLAN.md`, `PHASE_2_DATA_MODEL.md`, `PHASE_2_TEST_PLAN.md`, and `PHASE_2_IMPLEMENTATION_PLAN.md` cover the completed store-configuration phase.
 - `PHASE_3_PLAN.md`, `PHASE_3_DATA_MODEL.md`, `PHASE_3_TEST_PLAN.md`, and `PHASE_3_IMPLEMENTATION_PLAN.md` start planning for the next module: customer domain.
 - `PHASE_4_PLAN.md`, `PHASE_4_DATA_MODEL.md`, `PHASE_4_TEST_PLAN.md`, and `PHASE_4_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: catalog and merchandising.
+- `PHASE_5_PLAN.md`, `PHASE_5_DATA_MODEL.md`, `PHASE_5_TEST_PLAN.md`, and `PHASE_5_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: pricing and promotions.
 
 ## Next Likely Steps
 
-- The next roadmap phase after the completed customer domain is catalog and merchandising.
-- Phase 4 planning has started; catalog implementation should follow those planning docs.
-- Phase 4 Prisma schema changes for catalog and merchandising are now implemented and validated.
-- Phase 4 Prisma migration `phase_4_catalog_merchandising` has been generated and applied.
-- Real Phase 4 test files now exist for catalog implementation targets.
-- The project still builds cleanly and the current suite remains green with Phase 4 tests added as implementation targets.
-- Implemented the Phase 4 catalog domain for products, variants, categories, collections, and storefront catalog reads.
-- The current Phase 4 catalog scope is now fully implemented and all tests are passing.
+- Phase 4 catalog and merchandising is complete and all tests are passing.
+- The next roadmap phase is pricing and promotions.
+- Phase 5 planning has started; pricing and promotion implementation should follow those planning docs.
+- Phase 5 Prisma schema changes for pricing and promotions are now implemented and validated.
+- Phase 5 Prisma migration `phase_5_pricing_promotions` has been generated and applied.
+- Real Phase 5 pricing and promotions test files now exist as implementation targets.
+- The project still builds cleanly and the current suite remains green with Phase 5 tests added as implementation targets.
+- Implemented the first Phase 5 pricing slice for variant prices and admin pricing management.
+- Phase 5 coupon and promotion logic remains planned but not yet implemented.
+- Implemented the Phase 5 coupon and promotion baseline.
+- The current Phase 5 pricing and promotions scope is now fully implemented and all tests are passing.

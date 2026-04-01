@@ -8,29 +8,29 @@ import { IdentityModule } from "src/modules/identity/identity.module";
 import { PrismaModule } from "src/infrastructure/database/prisma/prisma.module";
 import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
 
-import { PricingService } from "./application/services/pricing.service";
-import { PRICING_REPOSITORY } from "./domain/repositories/pricing.repository.token";
-import { PrismaPricingRepository } from "./infrastructure/persistence/prisma-pricing.repository";
-import { AdminPricingController } from "./presentation/admin/controllers/admin-pricing.controller";
+import { PromotionService } from "./application/services/promotion.service";
+import { PROMOTION_REPOSITORY } from "./domain/repositories/promotion.repository.token";
+import { PrismaPromotionRepository } from "./infrastructure/persistence/prisma-promotion.repository";
+import { AdminCouponsController } from "./presentation/admin/controllers/admin-coupons.controller";
 
 @Module({
   imports: [PrismaModule, AuditModule, AccessControlModule, IdentityModule],
-  controllers: [AdminPricingController],
+  controllers: [AdminCouponsController],
   providers: [
     {
-      provide: PRICING_REPOSITORY,
-      useFactory: () => new PrismaPricingRepository(new PrismaService()),
+      provide: PROMOTION_REPOSITORY,
+      useFactory: () => new PrismaPromotionRepository(new PrismaService()),
     },
     {
-      provide: PricingService,
-      useFactory: (repository: PrismaPricingRepository) =>
-        new PricingService(
+      provide: PromotionService,
+      useFactory: (repository: PrismaPromotionRepository) =>
+        new PromotionService(
           repository,
           new AuditService(new PrismaAuditRepository(new PrismaService())),
         ),
-      inject: [PRICING_REPOSITORY],
+      inject: [PROMOTION_REPOSITORY],
     },
   ],
-  exports: [PricingService],
+  exports: [PromotionService],
 })
-export class PricingModule {}
+export class PromotionModule {}
