@@ -40,3 +40,8 @@
 - search result shape is defined
 - filter and sorting behavior is covered
 - admin reindex and status flows are covered
+
+## Current State
+
+- Phase 7 search unit, integration, storefront e2e, and admin e2e tests are implemented and passing
+- the currently planned Phase 7 search scope is fully covered by passing tests

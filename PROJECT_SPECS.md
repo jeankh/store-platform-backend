@@ -198,3 +198,5 @@
 - The current Phase 6 inventory scope is now fully implemented and all tests are passing.
 - The next roadmap phase is search and discovery.
 - Phase 7 planning has started; search implementation should follow those planning docs.
+- Implemented the Phase 7 search and discovery scope for storefront search plus admin reindex/status flows.
+- The current Phase 7 search scope is now fully implemented and all tests are passing.

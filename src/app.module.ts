@@ -17,6 +17,7 @@ import { OrderModule } from "./modules/order/order.module";
 import { PaymentModule } from "./modules/payment/payment.module";
 import { PricingModule } from "./modules/pricing/pricing.module";
 import { PromotionModule } from "./modules/promotion/promotion.module";
+import { SearchModule } from "./modules/search/search.module";
 import { ShippingModule } from "./modules/shipping/shipping.module";
 import { StoreModule } from "./modules/store/store.module";
 import { TenantModule } from "./modules/tenant/tenant.module";
@@ -37,6 +38,7 @@ import { WebhookModule } from "./modules/webhook/webhook.module";
     CatalogModule,
     PricingModule,
     PromotionModule,
+    SearchModule,
     InventoryModule,
     CartModule,
     CheckoutModule,

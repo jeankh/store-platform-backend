@@ -25,4 +25,7 @@
 ## Current Progress
 
 - Phase 7 planning has started.
-- No Phase 7 search code has been implemented yet.
+- Slice 1 is implemented and passing.
+- Slice 2 is implemented and passing.
+- Slice 3 is implemented and passing.
+- The currently planned Phase 7 search and discovery scope is fully implemented.
