@@ -170,6 +170,30 @@ export const SYSTEM_PERMISSIONS: PermissionDefinition[] = [
     action: "update",
   },
   {
+    code: "warehouse.read",
+    name: "Read warehouses",
+    resource: "warehouse",
+    action: "read",
+  },
+  {
+    code: "warehouse.update",
+    name: "Update warehouses",
+    resource: "warehouse",
+    action: "update",
+  },
+  {
+    code: "inventory.read",
+    name: "Read inventory",
+    resource: "inventory",
+    action: "read",
+  },
+  {
+    code: "inventory.update",
+    name: "Update inventory",
+    resource: "inventory",
+    action: "update",
+  },
+  {
     code: "role.create",
     name: "Create role",
     resource: "role",
