@@ -65,6 +65,13 @@ enum CheckoutStatus {
   ABANDONED
 }
 
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  FULFILLED
+}
+
 model Tenant {
   id                 String              @id @default(uuid()) @db.Uuid
   slug               String              @unique
@@ -93,6 +100,7 @@ model Tenant {
   stockItems         StockItem[]
   carts              Cart[]
   checkouts          Checkout[]
+  orders             Order[]
   roles              Role[]
   auditLogs          AuditLog[]
 
@@ -141,6 +149,7 @@ model Store {
   stockItems         StockItem[]
   carts              Cart[]
   checkouts          Checkout[]
+  orders             Order[]
 
   @@unique([tenantId, slug])
   @@map("stores")
@@ -224,6 +233,7 @@ model Customer {
   promotionUsages PromotionUsage[]
   carts           Cart[]
   checkouts       Checkout[]
+  orders          Order[]
 
   @@unique([tenantId, email])
   @@map("customers")
@@ -349,6 +359,7 @@ model Checkout {
   shippingMethods CheckoutShippingMethod[]
   discounts       CheckoutDiscount[]
   taxes           CheckoutTax[]
+  orders          Order[]
 
   @@map("checkouts")
 }
@@ -428,6 +439,92 @@ model CheckoutTax {
   @@map("checkout_taxes")
 }
 
+model Order {
+  id             String               @id @default(uuid()) @db.Uuid
+  tenantId       String               @map("tenant_id") @db.Uuid
+  storeId        String               @map("store_id") @db.Uuid
+  checkoutId     String               @map("checkout_id") @db.Uuid
+  customerId     String?              @map("customer_id") @db.Uuid
+  status         OrderStatus          @default(PENDING)
+  currencyCode   String               @map("currency_code")
+  subtotalAmount Int                  @map("subtotal_amount")
+  discountAmount Int                  @map("discount_amount")
+  taxAmount      Int                  @map("tax_amount")
+  totalAmount    Int                  @map("total_amount")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+  tenant         Tenant               @relation(fields: [tenantId], references: [id])
+  store          Store                @relation(fields: [storeId], references: [id])
+  checkout       Checkout             @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
+  customer       Customer?            @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+  addresses      OrderAddress[]
+  statusHistory  OrderStatusHistory[]
+  notes          OrderNote[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id                 String         @id @default(uuid()) @db.Uuid
+  orderId            String         @map("order_id") @db.Uuid
+  variantId          String         @map("variant_id") @db.Uuid
+  quantity           Int
+  unitAmountSnapshot Int            @map("unit_amount_snapshot")
+  currencyCode       String         @map("currency_code")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  order              Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant            ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model OrderAddress {
+  id          String   @id @default(uuid()) @db.Uuid
+  orderId     String   @map("order_id") @db.Uuid
+  type        String
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  line1       String   @map("line_1")
+  line2       String?  @map("line_2")
+  city        String
+  region      String?
+  postalCode  String   @map("postal_code")
+  countryCode String   @map("country_code")
+  phone       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_addresses")
+}
+
+model OrderStatusHistory {
+  id          String       @id @default(uuid()) @db.Uuid
+  orderId     String       @map("order_id") @db.Uuid
+  fromStatus  OrderStatus? @map("from_status")
+  toStatus    OrderStatus  @map("to_status")
+  actorUserId String?      @map("actor_user_id") @db.Uuid
+  createdAt   DateTime     @default(now()) @map("created_at")
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorUser   User?        @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@map("order_status_history")
+}
+
+model OrderNote {
+  id           String   @id @default(uuid()) @db.Uuid
+  orderId      String   @map("order_id") @db.Uuid
+  authorUserId String   @map("author_user_id") @db.Uuid
+  content      String
+  createdAt    DateTime @default(now()) @map("created_at")
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  authorUser   User     @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+
+  @@map("order_notes")
+}
+
 model Product {
   id          String              @id @default(uuid()) @db.Uuid
   tenantId    String              @map("tenant_id") @db.Uuid
@@ -468,6 +565,7 @@ model ProductVariant {
   stockItems      StockItem[]
   cartItems       CartItem[]
   checkoutItems   CheckoutItem[]
+  orderItems      OrderItem[]
 
   @@unique([productId, sku])
   @@map("product_variants")
@@ -867,21 +965,23 @@ model LowStockAlert {
 }
 
 model User {
-  id               String            @id @default(uuid()) @db.Uuid
-  tenantId         String            @map("tenant_id") @db.Uuid
-  email            String
-  passwordHash     String            @map("password_hash")
-  status           UserStatus        @default(ACTIVE)
-  lastLoginAt      DateTime?         @map("last_login_at")
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
-  tenant           Tenant            @relation(fields: [tenantId], references: [id])
-  staffProfile     StaffProfile?
-  authSessions     AuthSession[]
-  refreshTokens    RefreshToken[]
-  userRoles        UserRole[]
-  auditLogs        AuditLog[]        @relation("AuditActor")
-  stockAdjustments StockAdjustment[]
+  id                   String               @id @default(uuid()) @db.Uuid
+  tenantId             String               @map("tenant_id") @db.Uuid
+  email                String
+  passwordHash         String               @map("password_hash")
+  status               UserStatus           @default(ACTIVE)
+  lastLoginAt          DateTime?            @map("last_login_at")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
+  tenant               Tenant               @relation(fields: [tenantId], references: [id])
+  staffProfile         StaffProfile?
+  authSessions         AuthSession[]
+  refreshTokens        RefreshToken[]
+  userRoles            UserRole[]
+  auditLogs            AuditLog[]           @relation("AuditActor")
+  stockAdjustments     StockAdjustment[]
+  orderStatusHistories OrderStatusHistory[]
+  orderNotes           OrderNote[]
 
   @@unique([tenantId, email])
   @@map("users")

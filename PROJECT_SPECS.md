@@ -46,6 +46,7 @@
 - Confirmed the open Phase 6 decisions: reservations are location-specific, `stock_items` remain separate from variants, and low-stock alerts are location-based.
 - Confirmed the open Phase 7 decisions: no relational search job tables yet, search documents can expose a simple default price projection, and Phase 7 search returns published products only.
 - Confirmed the open Phase 8 decisions: guest carts use `guest_token`, checkouts are created from carts only, and cart totals are stored as a materialized snapshot table.
+- Confirmed the open Phase 9 decisions: order numbering is deferred, storefront order history requires authenticated customers only, and order statuses use a dedicated enum.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -177,6 +178,7 @@
 - `PHASE_6_PLAN.md`, `PHASE_6_DATA_MODEL.md`, `PHASE_6_TEST_PLAN.md`, and `PHASE_6_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: inventory and fulfillment foundation.
 - `PHASE_7_PLAN.md`, `PHASE_7_DATA_MODEL.md`, `PHASE_7_TEST_PLAN.md`, and `PHASE_7_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: search and discovery.
 - `PHASE_8_PLAN.md`, `PHASE_8_DATA_MODEL.md`, `PHASE_8_TEST_PLAN.md`, and `PHASE_8_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: cart and checkout.
+- `PHASE_9_PLAN.md`, `PHASE_9_DATA_MODEL.md`, `PHASE_9_TEST_PLAN.md`, and `PHASE_9_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: orders.
 
 ## Next Likely Steps
 
@@ -209,3 +211,8 @@
 - Real Phase 8 cart and checkout test files now exist as implementation targets.
 - Implemented the Phase 8 cart and checkout scope for guest carts, cart items, cart totals, and checkout creation/read/update.
 - The current Phase 8 cart and checkout scope is now fully implemented and all tests are passing.
+- The next roadmap phase is orders.
+- Phase 9 planning has started; order implementation should follow those planning docs.
+- Phase 9 Prisma schema changes for orders are now implemented and validated.
+- Phase 9 Prisma migration `phase_9_orders` has been generated and applied.
+- Real Phase 9 order test files now exist as implementation targets.
