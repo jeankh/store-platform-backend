@@ -44,6 +44,7 @@
 - Confirmed the open Phase 4 decisions: products are tenant-scoped and store-scoped, pricing fields stay out of Phase 4, and category trees support unlimited nesting through `parent_id`.
 - Confirmed the open Phase 5 decisions: compare-at prices stay in a separate table, scheduled prices stay in a separate table, and monetary values use integer minor units.
 - Confirmed the open Phase 6 decisions: reservations are location-specific, `stock_items` remain separate from variants, and low-stock alerts are location-based.
+- Confirmed the open Phase 7 decisions: no relational search job tables yet, search documents can expose a simple default price projection, and Phase 7 search returns published products only.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -173,6 +174,7 @@
 - `PHASE_4_PLAN.md`, `PHASE_4_DATA_MODEL.md`, `PHASE_4_TEST_PLAN.md`, and `PHASE_4_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: catalog and merchandising.
 - `PHASE_5_PLAN.md`, `PHASE_5_DATA_MODEL.md`, `PHASE_5_TEST_PLAN.md`, and `PHASE_5_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: pricing and promotions.
 - `PHASE_6_PLAN.md`, `PHASE_6_DATA_MODEL.md`, `PHASE_6_TEST_PLAN.md`, and `PHASE_6_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: inventory and fulfillment foundation.
+- `PHASE_7_PLAN.md`, `PHASE_7_DATA_MODEL.md`, `PHASE_7_TEST_PLAN.md`, and `PHASE_7_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: search and discovery.
 
 ## Next Likely Steps
 
@@ -194,3 +196,5 @@
 - Real Phase 6 inventory test files now exist as implementation targets.
 - Implemented the Phase 6 inventory and fulfillment foundation for warehouses, locations, stock levels, reservations, adjustments, movement history, and low-stock alerts.
 - The current Phase 6 inventory scope is now fully implemented and all tests are passing.
+- The next roadmap phase is search and discovery.
+- Phase 7 planning has started; search implementation should follow those planning docs.
