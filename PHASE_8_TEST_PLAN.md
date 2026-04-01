@@ -46,3 +46,13 @@
 - cart and checkout success/failure cases are named
 - guest and customer ownership paths are covered
 - cart validation and checkout snapshot rules are covered
+
+## Status
+
+- real Phase 8 cart and checkout test files now exist under `test/unit`, `test/integration`, and `test/e2e`
+- the files currently define explicit implementation targets as `todo` cases because Phase 8 code has not been written yet
+
+## Current State
+
+- Phase 8 cart and checkout unit, integration, and storefront e2e tests are implemented and passing
+- the currently planned Phase 8 cart and checkout scope is fully covered by passing tests

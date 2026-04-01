@@ -54,6 +54,17 @@ enum StockMovementType {
   RELEASE
 }
 
+enum CartStatus {
+  ACTIVE
+  ABANDONED
+}
+
+enum CheckoutStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
 model Tenant {
   id                 String              @id @default(uuid()) @db.Uuid
   slug               String              @unique
@@ -80,6 +91,8 @@ model Tenant {
   warehouses         Warehouse[]
   inventoryLocations InventoryLocation[]
   stockItems         StockItem[]
+  carts              Cart[]
+  checkouts          Checkout[]
   roles              Role[]
   auditLogs          AuditLog[]
 
@@ -126,6 +139,8 @@ model Store {
   warehouses         Warehouse[]
   inventoryLocations InventoryLocation[]
   stockItems         StockItem[]
+  carts              Cart[]
+  checkouts          Checkout[]
 
   @@unique([tenantId, slug])
   @@map("stores")
@@ -207,6 +222,8 @@ model Customer {
   preferences     CustomerPreference?
   sessions        CustomerSession[]
   promotionUsages PromotionUsage[]
+  carts           Cart[]
+  checkouts       Checkout[]
 
   @@unique([tenantId, email])
   @@map("customers")
@@ -264,6 +281,153 @@ model CustomerSession {
   @@map("customer_sessions")
 }
 
+model Cart {
+  id         String     @id @default(uuid()) @db.Uuid
+  tenantId   String     @map("tenant_id") @db.Uuid
+  storeId    String     @map("store_id") @db.Uuid
+  customerId String?    @map("customer_id") @db.Uuid
+  guestToken String?    @map("guest_token")
+  status     CartStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  store      Store      @relation(fields: [storeId], references: [id])
+  customer   Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items      CartItem[]
+  totals     CartTotal?
+  checkouts  Checkout[]
+
+  @@index([guestToken])
+  @@map("carts")
+}
+
+model CartItem {
+  id                 String         @id @default(uuid()) @db.Uuid
+  cartId             String         @map("cart_id") @db.Uuid
+  variantId          String         @map("variant_id") @db.Uuid
+  quantity           Int
+  unitAmountSnapshot Int            @map("unit_amount_snapshot")
+  currencyCode       String         @map("currency_code")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  cart               Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant            ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model CartTotal {
+  id             String   @id @default(uuid()) @db.Uuid
+  cartId         String   @unique @map("cart_id") @db.Uuid
+  subtotalAmount Int      @map("subtotal_amount")
+  discountAmount Int      @map("discount_amount")
+  taxAmount      Int      @map("tax_amount")
+  totalAmount    Int      @map("total_amount")
+  currencyCode   String   @map("currency_code")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  cart           Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@map("cart_totals")
+}
+
+model Checkout {
+  id              String                   @id @default(uuid()) @db.Uuid
+  tenantId        String                   @map("tenant_id") @db.Uuid
+  storeId         String                   @map("store_id") @db.Uuid
+  cartId          String                   @map("cart_id") @db.Uuid
+  customerId      String?                  @map("customer_id") @db.Uuid
+  status          CheckoutStatus           @default(ACTIVE)
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+  tenant          Tenant                   @relation(fields: [tenantId], references: [id])
+  store           Store                    @relation(fields: [storeId], references: [id])
+  cart            Cart                     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  customer        Customer?                @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items           CheckoutItem[]
+  addresses       CheckoutAddress[]
+  shippingMethods CheckoutShippingMethod[]
+  discounts       CheckoutDiscount[]
+  taxes           CheckoutTax[]
+
+  @@map("checkouts")
+}
+
+model CheckoutItem {
+  id                 String         @id @default(uuid()) @db.Uuid
+  checkoutId         String         @map("checkout_id") @db.Uuid
+  variantId          String         @map("variant_id") @db.Uuid
+  quantity           Int
+  unitAmountSnapshot Int            @map("unit_amount_snapshot")
+  currencyCode       String         @map("currency_code")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  checkout           Checkout       @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
+  variant            ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("checkout_items")
+}
+
+model CheckoutAddress {
+  id          String   @id @default(uuid()) @db.Uuid
+  checkoutId  String   @map("checkout_id") @db.Uuid
+  type        String
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  line1       String   @map("line_1")
+  line2       String?  @map("line_2")
+  city        String
+  region      String?
+  postalCode  String   @map("postal_code")
+  countryCode String   @map("country_code")
+  phone       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  checkout    Checkout @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
+
+  @@map("checkout_addresses")
+}
+
+model CheckoutShippingMethod {
+  id           String   @id @default(uuid()) @db.Uuid
+  checkoutId   String   @map("checkout_id") @db.Uuid
+  methodCode   String   @map("method_code")
+  methodLabel  String   @map("method_label")
+  amount       Int
+  currencyCode String   @map("currency_code")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  checkout     Checkout @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
+
+  @@map("checkout_shipping_methods")
+}
+
+model CheckoutDiscount {
+  id           String   @id @default(uuid()) @db.Uuid
+  checkoutId   String   @map("checkout_id") @db.Uuid
+  code         String?
+  amount       Int
+  currencyCode String   @map("currency_code")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  checkout     Checkout @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
+
+  @@map("checkout_discounts")
+}
+
+model CheckoutTax {
+  id           String   @id @default(uuid()) @db.Uuid
+  checkoutId   String   @map("checkout_id") @db.Uuid
+  name         String
+  amount       Int
+  currencyCode String   @map("currency_code")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  checkout     Checkout @relation(fields: [checkoutId], references: [id], onDelete: Cascade)
+
+  @@map("checkout_taxes")
+}
+
 model Product {
   id          String              @id @default(uuid()) @db.Uuid
   tenantId    String              @map("tenant_id") @db.Uuid
@@ -302,6 +466,8 @@ model ProductVariant {
   compareAtPrices CompareAtPrice[]
   scheduledPrices ScheduledPrice[]
   stockItems      StockItem[]
+  cartItems       CartItem[]
+  checkoutItems   CheckoutItem[]
 
   @@unique([productId, sku])
   @@map("product_variants")

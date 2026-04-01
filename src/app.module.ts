@@ -36,6 +36,7 @@ import { WebhookModule } from "./modules/webhook/webhook.module";
     AuditModule,
     CustomerModule,
     CatalogModule,
+    CartModule,
     PricingModule,
     PromotionModule,
     SearchModule,

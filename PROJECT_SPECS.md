@@ -204,3 +204,8 @@
 - The current Phase 7 search scope is now fully implemented and all tests are passing.
 - The next roadmap phase is cart and checkout.
 - Phase 8 planning has started; cart and checkout implementation should follow those planning docs.
+- Phase 8 Prisma schema changes for cart and checkout are now implemented and validated.
+- Phase 8 Prisma migration `phase_8_cart_checkout` has been generated and applied.
+- Real Phase 8 cart and checkout test files now exist as implementation targets.
+- Implemented the Phase 8 cart and checkout scope for guest carts, cart items, cart totals, and checkout creation/read/update.
+- The current Phase 8 cart and checkout scope is now fully implemented and all tests are passing.

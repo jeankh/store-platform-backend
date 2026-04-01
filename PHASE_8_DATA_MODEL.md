@@ -111,3 +111,8 @@
 - guest carts are tracked by explicit token
 - checkout lifecycle begins from cart state only
 - cart totals are persisted as snapshots for stable checkout behavior
+
+## Status
+
+- Phase 8 cart and checkout models have been translated into `prisma/schema.prisma`.
+- Prisma validation and formatting pass for the current Phase 8 schema draft.
