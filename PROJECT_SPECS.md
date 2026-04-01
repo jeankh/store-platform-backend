@@ -45,6 +45,7 @@
 - Confirmed the open Phase 5 decisions: compare-at prices stay in a separate table, scheduled prices stay in a separate table, and monetary values use integer minor units.
 - Confirmed the open Phase 6 decisions: reservations are location-specific, `stock_items` remain separate from variants, and low-stock alerts are location-based.
 - Confirmed the open Phase 7 decisions: no relational search job tables yet, search documents can expose a simple default price projection, and Phase 7 search returns published products only.
+- Confirmed the open Phase 8 decisions: guest carts use `guest_token`, checkouts are created from carts only, and cart totals are stored as a materialized snapshot table.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -175,6 +176,7 @@
 - `PHASE_5_PLAN.md`, `PHASE_5_DATA_MODEL.md`, `PHASE_5_TEST_PLAN.md`, and `PHASE_5_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: pricing and promotions.
 - `PHASE_6_PLAN.md`, `PHASE_6_DATA_MODEL.md`, `PHASE_6_TEST_PLAN.md`, and `PHASE_6_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: inventory and fulfillment foundation.
 - `PHASE_7_PLAN.md`, `PHASE_7_DATA_MODEL.md`, `PHASE_7_TEST_PLAN.md`, and `PHASE_7_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: search and discovery.
+- `PHASE_8_PLAN.md`, `PHASE_8_DATA_MODEL.md`, `PHASE_8_TEST_PLAN.md`, and `PHASE_8_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: cart and checkout.
 
 ## Next Likely Steps
 
@@ -200,3 +202,5 @@
 - Phase 7 planning has started; search implementation should follow those planning docs.
 - Implemented the Phase 7 search and discovery scope for storefront search plus admin reindex/status flows.
 - The current Phase 7 search scope is now fully implemented and all tests are passing.
+- The next roadmap phase is cart and checkout.
+- Phase 8 planning has started; cart and checkout implementation should follow those planning docs.
