@@ -47,6 +47,7 @@
 - Confirmed the open Phase 7 decisions: no relational search job tables yet, search documents can expose a simple default price projection, and Phase 7 search returns published products only.
 - Confirmed the open Phase 8 decisions: guest carts use `guest_token`, checkouts are created from carts only, and cart totals are stored as a materialized snapshot table.
 - Confirmed the open Phase 9 decisions: order numbering is deferred, storefront order history requires authenticated customers only, and order statuses use a dedicated enum.
+- Confirmed the open Phase 10 decisions: payment intent status uses an enum, raw provider payloads live in webhook events only, and partial capture/refund support is enabled at the schema level.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -179,6 +180,7 @@
 - `PHASE_7_PLAN.md`, `PHASE_7_DATA_MODEL.md`, `PHASE_7_TEST_PLAN.md`, and `PHASE_7_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: search and discovery.
 - `PHASE_8_PLAN.md`, `PHASE_8_DATA_MODEL.md`, `PHASE_8_TEST_PLAN.md`, and `PHASE_8_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: cart and checkout.
 - `PHASE_9_PLAN.md`, `PHASE_9_DATA_MODEL.md`, `PHASE_9_TEST_PLAN.md`, and `PHASE_9_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: orders.
+- `PHASE_10_PLAN.md`, `PHASE_10_DATA_MODEL.md`, `PHASE_10_TEST_PLAN.md`, and `PHASE_10_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: payments.
 
 ## Next Likely Steps
 
@@ -216,3 +218,5 @@
 - Phase 9 Prisma schema changes for orders are now implemented and validated.
 - Phase 9 Prisma migration `phase_9_orders` has been generated and applied.
 - Real Phase 9 order test files now exist as implementation targets.
+- The next roadmap phase is payments.
+- Phase 10 planning has started; payment implementation should follow those planning docs.
