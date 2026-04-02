@@ -44,3 +44,8 @@
 - storefront and admin payment flows have named success/failure cases
 - payment state transitions are covered
 - capture/refund paths are covered
+
+## Current State
+
+- Phase 10 payment unit, integration, storefront e2e, and admin e2e tests are implemented and passing
+- the currently planned Phase 10 payment scope is fully covered by passing tests

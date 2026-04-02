@@ -48,6 +48,7 @@
 - Confirmed the open Phase 8 decisions: guest carts use `guest_token`, checkouts are created from carts only, and cart totals are stored as a materialized snapshot table.
 - Confirmed the open Phase 9 decisions: order numbering is deferred, storefront order history requires authenticated customers only, and order statuses use a dedicated enum.
 - Confirmed the open Phase 10 decisions: payment intent status uses an enum, raw provider payloads live in webhook events only, and partial capture/refund support is enabled at the schema level.
+- Confirmed the open Phase 11 decisions: shipping rates stay on shipping methods, shipment status uses an enum, and multiple shipments per order are supported.
 - Implemented Phase 3 Prisma schema changes for customers, customer addresses, customer preferences, and customer sessions.
 - Added a manual Phase 3 migration SQL file because the local PostgreSQL/Docker environment was unavailable during migration generation.
 - Implemented the first Phase 3 customer slice: storefront customer auth and profile services/controllers plus the initial test files.
@@ -181,6 +182,7 @@
 - `PHASE_8_PLAN.md`, `PHASE_8_DATA_MODEL.md`, `PHASE_8_TEST_PLAN.md`, and `PHASE_8_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: cart and checkout.
 - `PHASE_9_PLAN.md`, `PHASE_9_DATA_MODEL.md`, `PHASE_9_TEST_PLAN.md`, and `PHASE_9_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: orders.
 - `PHASE_10_PLAN.md`, `PHASE_10_DATA_MODEL.md`, `PHASE_10_TEST_PLAN.md`, and `PHASE_10_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: payments.
+- `PHASE_11_PLAN.md`, `PHASE_11_DATA_MODEL.md`, `PHASE_11_TEST_PLAN.md`, and `PHASE_11_IMPLEMENTATION_PLAN.md` start planning for the next roadmap phase: shipping.
 
 ## Next Likely Steps
 
@@ -220,3 +222,6 @@
 - Real Phase 9 order test files now exist as implementation targets.
 - The next roadmap phase is payments.
 - Phase 10 planning has started; payment implementation should follow those planning docs.
+- Phase 10 payment scope is now fully implemented and all tests are passing.
+- The next roadmap phase is shipping.
+- Phase 11 planning has started; shipping implementation should follow those planning docs.

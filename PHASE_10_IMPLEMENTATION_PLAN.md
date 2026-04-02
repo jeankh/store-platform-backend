@@ -25,4 +25,9 @@
 ## Current Progress
 
 - Phase 10 planning has started.
-- No Phase 10 payment code has been implemented yet.
+- Phase 10 Prisma schema changes are implemented.
+- Phase 10 migration is generated and applied.
+- Slice 1 is implemented and passing.
+- Slice 2 is implemented and passing.
+- Slice 3 is implemented and passing.
+- The currently planned Phase 10 payment scope is fully implemented.
