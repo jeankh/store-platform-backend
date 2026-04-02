@@ -72,37 +72,59 @@ enum OrderStatus {
   FULFILLED
 }
 
+enum PaymentIntentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentTransactionType {
+  AUTHORIZATION
+  CAPTURE
+  REFUND
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
 model Tenant {
-  id                 String              @id @default(uuid()) @db.Uuid
-  slug               String              @unique
-  name               String
-  status             TenantStatus        @default(ACTIVE)
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  settings           TenantSettings?
-  stores             Store[]
-  users              User[]
-  customers          Customer[]
-  products           Product[]
-  categories         Category[]
-  collections        Collection[]
-  brands             Brand[]
-  tags               Tag[]
-  attributes         Attribute[]
-  prices             Price[]
-  compareAtPrices    CompareAtPrice[]
-  scheduledPrices    ScheduledPrice[]
-  coupons            Coupon[]
-  promotionRules     PromotionRule[]
-  promotionUsages    PromotionUsage[]
-  warehouses         Warehouse[]
-  inventoryLocations InventoryLocation[]
-  stockItems         StockItem[]
-  carts              Cart[]
-  checkouts          Checkout[]
-  orders             Order[]
-  roles              Role[]
-  auditLogs          AuditLog[]
+  id                   String                @id @default(uuid()) @db.Uuid
+  slug                 String                @unique
+  name                 String
+  status               TenantStatus          @default(ACTIVE)
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  settings             TenantSettings?
+  stores               Store[]
+  users                User[]
+  customers            Customer[]
+  products             Product[]
+  categories           Category[]
+  collections          Collection[]
+  brands               Brand[]
+  tags                 Tag[]
+  attributes           Attribute[]
+  prices               Price[]
+  compareAtPrices      CompareAtPrice[]
+  scheduledPrices      ScheduledPrice[]
+  coupons              Coupon[]
+  promotionRules       PromotionRule[]
+  promotionUsages      PromotionUsage[]
+  warehouses           Warehouse[]
+  inventoryLocations   InventoryLocation[]
+  stockItems           StockItem[]
+  carts                Cart[]
+  checkouts            Checkout[]
+  orders               Order[]
+  paymentIntents       PaymentIntent[]
+  paymentWebhookEvents PaymentWebhookEvent[]
+  roles                Role[]
+  auditLogs            AuditLog[]
 
   @@map("tenants")
 }
@@ -150,6 +172,7 @@ model Store {
   carts              Cart[]
   checkouts          Checkout[]
   orders             Order[]
+  paymentIntents     PaymentIntent[]
 
   @@unique([tenantId, slug])
   @@map("stores")
@@ -461,6 +484,7 @@ model Order {
   addresses      OrderAddress[]
   statusHistory  OrderStatusHistory[]
   notes          OrderNote[]
+  paymentIntents PaymentIntent[]
 
   @@map("orders")
 }
@@ -523,6 +547,76 @@ model OrderNote {
   authorUser   User     @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
 
   @@map("order_notes")
+}
+
+model PaymentIntent {
+  id                String               @id @default(uuid()) @db.Uuid
+  tenantId          String               @map("tenant_id") @db.Uuid
+  storeId           String               @map("store_id") @db.Uuid
+  orderId           String               @map("order_id") @db.Uuid
+  provider          String
+  providerReference String?              @map("provider_reference")
+  status            PaymentIntentStatus  @default(PENDING)
+  currencyCode      String               @map("currency_code")
+  amount            Int
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  tenant            Tenant               @relation(fields: [tenantId], references: [id])
+  store             Store                @relation(fields: [storeId], references: [id])
+  order             Order                @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  transactions      PaymentTransaction[]
+  captures          PaymentCapture[]
+  refunds           PaymentRefund[]
+
+  @@map("payment_intents")
+}
+
+model PaymentTransaction {
+  id                String                   @id @default(uuid()) @db.Uuid
+  paymentIntentId   String                   @map("payment_intent_id") @db.Uuid
+  type              PaymentTransactionType
+  status            PaymentTransactionStatus
+  providerReference String?                  @map("provider_reference")
+  amount            Int
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  paymentIntent     PaymentIntent            @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
+
+  @@map("payment_transactions")
+}
+
+model PaymentCapture {
+  id              String        @id @default(uuid()) @db.Uuid
+  paymentIntentId String        @map("payment_intent_id") @db.Uuid
+  amount          Int
+  createdAt       DateTime      @default(now()) @map("created_at")
+  paymentIntent   PaymentIntent @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
+
+  @@map("payment_captures")
+}
+
+model PaymentRefund {
+  id              String        @id @default(uuid()) @db.Uuid
+  paymentIntentId String        @map("payment_intent_id") @db.Uuid
+  amount          Int
+  reason          String?
+  createdAt       DateTime      @default(now()) @map("created_at")
+  paymentIntent   PaymentIntent @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
+
+  @@map("payment_refunds")
+}
+
+model PaymentWebhookEvent {
+  id                String    @id @default(uuid()) @db.Uuid
+  provider          String
+  eventType         String    @map("event_type")
+  providerReference String?   @map("provider_reference")
+  payload           Json
+  processedAt       DateTime? @map("processed_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  tenantId          String?   @map("tenant_id") @db.Uuid
+  tenant            Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@map("payment_webhook_events")
 }
 
 model Product {

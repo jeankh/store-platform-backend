@@ -224,6 +224,18 @@ export const SYSTEM_PERMISSIONS: PermissionDefinition[] = [
     action: "update",
   },
   {
+    code: "payment.read",
+    name: "Read payments",
+    resource: "payment",
+    action: "read",
+  },
+  {
+    code: "payment.update",
+    name: "Update payments",
+    resource: "payment",
+    action: "update",
+  },
+  {
     code: "role.create",
     name: "Create role",
     resource: "role",
